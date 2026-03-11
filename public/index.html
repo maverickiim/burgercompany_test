@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>The Burger Company | Online Ordering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+      }
+      .sticky-category {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+      }
+      .cart-bounce {
+        animation: bounce 0.3s ease;
+      }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-gray-900">
+    <!-- Hero Header -->
+    <header
+      class="bg-yellow-400 pt-8 pb-12 px-6 rounded-b-[40px] shadow-lg relative overflow-hidden"
+    >
+      <div class="relative z-10 text-center">
+        <h1
+          class="text-4xl font-black italic tracking-tighter text-black uppercase"
+        >
+          Burger Company
+        </h1>
+        <p class="text-black/70 font-bold text-sm tracking-widest mt-1">
+          IIM SIRMAUR
+        </p>
+      </div>
+      <div
+        class="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full"
+      ></div>
+    </header>
+
+    <!-- Search -->
+    <div class="px-6 -mt-6 relative z-20">
+      <div
+        class="bg-white rounded-2xl shadow-xl p-2 flex items-center border border-gray-100"
+      >
+        <i class="fa-solid fa-magnifying-glass text-gray-400 ml-4"></i>
+        <input
+          type="text"
+          id="search"
+          placeholder="Search menu..."
+          class="w-full p-3 outline-none text-sm font-medium"
+          onkeyup="filterMenu()"
+        />
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav
+      id="nav-pills"
+      class="flex overflow-x-auto gap-3 px-6 py-6 no-scrollbar whitespace-nowrap sticky top-0 bg-gray-50/80 backdrop-blur-md z-30 border-b border-gray-200 shadow-sm mb-4"
+    >
+      <!-- Buttons will be injected here to stay in sync with menu keys -->
+    </nav>
+
+    <!-- Menu -->
+    <main id="menu-container" class="px-6 space-y-10 pb-32">
+      <!-- Injected -->
+    </main>
+
+    <!-- Cart Bar -->
+    <div
+      id="cart-bar"
+      class="fixed bottom-6 left-6 right-6 bg-black text-white p-4 rounded-3xl shadow-2xl z-50 transform translate-y-32 transition-transform duration-500 flex justify-between items-center border-t border-white/10"
+    >
+      <div class="flex items-center gap-4">
+        <div class="relative">
+          <i class="fa-solid fa-bag-shopping text-2xl text-yellow-400"></i>
+          <span
+            id="cart-count"
+            class="absolute -top-2 -right-2 bg-white text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-black"
+            >0</span
+          >
+        </div>
+        <div>
+          <p
+            class="text-[10px] text-gray-400 uppercase font-black tracking-widest"
+          >
+            Total
+          </p>
+          <p class="text-xl font-black">₹<span id="cart-total">0</span></p>
+        </div>
+      </div>
+      <button
+        onclick="openCheckout()"
+        class="bg-yellow-400 text-black px-8 py-3 rounded-2xl font-black text-sm active:scale-95 transition-transform"
+      >
+        CHECKOUT
+      </button>
+    </div>
+
+    <!-- Modal -->
+    <div
+      id="modal"
+      class="fixed inset-0 bg-black/80 z-[60] hidden backdrop-blur-sm p-6 items-end sm:items-center justify-center"
+    >
+      <div
+        class="bg-white w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl animate-slide-up"
+      >
+        <div class="bg-yellow-400 p-6 flex justify-between items-center">
+          <h2 class="text-xl font-black italic">CONFIRM ORDER</h2>
+          <button
+            onclick="closeCheckout()"
+            class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="space-y-1">
+            <label
+              class="text-[10px] font-black text-gray-400 uppercase tracking-widest"
+              >Your Name</label
+            >
+            <input
+              type="text"
+              id="cust-name"
+              placeholder="John Doe"
+              class="w-full bg-gray-50 border-0 p-4 rounded-2xl outline-none focus:ring-2 ring-yellow-400"
+            />
+          </div>
+          <div class="space-y-1">
+            <label
+              class="text-[10px] font-black text-gray-400 uppercase tracking-widest"
+              >Phone Number</label
+            >
+            <input
+              type="tel"
+              id="cust-phone"
+              placeholder="e.g., +91 98765 43210"
+              class="w-full bg-gray-50 border-0 p-4 rounded-2xl outline-none focus:ring-2 ring-yellow-400"
+            />
+          </div>
+
+          <div
+            id="order-summary"
+            class="bg-gray-50 p-4 rounded-2xl max-h-40 overflow-y-auto"
+          ></div>
+
+          <button
+            id="final-submit"
+            onclick="sendOrder()"
+            class="w-full bg-black text-white py-5 rounded-[24px] font-black text-lg shadow-xl active:scale-95 transition-transform flex justify-center items-center gap-3"
+          >
+            SEND TO RESTAURANT
+            <i class="fa-solid fa-paper-plane text-yellow-400"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const menu = {
+        "VEG BURGER": [
+          { name: "Veg Rockstar", price: 40 },
+          { name: "Veg Snacker", price: 65 },
+          { name: "Veg Makhani", price: 75 },
+          { name: "Punjabi Gabru", price: 80 },
+          { name: "Korean King", price: 100 },
+          { name: "Mexican Marvel", price: 119 },
+          { name: "Veg Mighty Cheese", price: 149 },
+          { name: "Tandoori Paneer", price: 150 },
+        ],
+        "NON VEG BURGER": [
+          { name: "Crispy Chicken", price: 69 },
+          { name: "Butter Chicken", price: 99 },
+          { name: "Fried Chicken Snacker", price: 110 },
+          { name: "Korean BBQ Grilled Chicken", price: 159 },
+          { name: "Tandoori Grilled Chicken", price: 159 },
+          { name: "Chicken Mighty Cheese", price: 169 },
+          { name: "Mr. Crunchos", price: 169 },
+          { name: "Cheese Chicken Crunchos", price: 179 },
+        ],
+        "FRIED CHICKEN": [
+          { name: "Chicken Popcorn (Reg)", price: 79 },
+          { name: "Chicken Popcorn (Large)", price: 139 },
+          { name: "Chicken Strips (3 PCS)", price: 89 },
+          { name: "Chicken Strips (6 PCS)", price: 179 },
+          { name: "Chicken Wings Peri Peri", price: 89 },
+          { name: "Chicken Wings BBQ", price: 99 },
+          { name: "Boiled Egg 2PCS", price: 30 },
+        ],
+        FRIES: [
+          { name: "Salted Fries", price: 69 },
+          { name: "Peri Peri Fries", price: 79 },
+          { name: "Cheese Loaded Fries", price: 129 },
+        ],
+        APPETIZERS: [
+          { name: "Piza Pockets", price: 89 },
+          { name: "Cheese Garlic Bread", price: 89 },
+          { name: "Chicken Nuggets 6PCS", price: 139 },
+          { name: "Chicken Nuggets 9PCS", price: 159 },
+        ],
+        SANDWICHES: [
+          { name: "Veg Cheese", price: 75 },
+          { name: "Paneer Tikka", price: 85 },
+          { name: "Peri Peri Paneer", price: 99 },
+          { name: "Tandoori Chicken", price: 109 },
+        ],
+        MOMOS: [
+          { name: "Veg Momos", price: 70 },
+          { name: "Non Veg Momos", price: 85 },
+        ],
+        PIZZAS: [
+          { name: "Onion Piza (Small)", price: 49 },
+          { name: "Margherita Piza (Reg)", price: 149 },
+          { name: "Veg Overloaded (Reg)", price: 179 },
+          { name: "Peppy Panner Piza", price: 189 },
+          { name: "Cheesy Chicken Piza", price: 209 },
+          { name: "Tandoori Chicken Piza", price: 209 },
+        ],
+        PASTAS: [
+          { name: "White Sauce Pasta Veg", price: 150 },
+          { name: "White Sauce Pasta NV", price: 170 },
+          { name: "Red Sauce Pasta Veg", price: 150 },
+          { name: "Red Sauce Pasta NV", price: 170 },
+        ],
+        INJECTORS: [
+          { name: "Blue Ocean Injector", price: 129 },
+          { name: "Watermelon Injector", price: 129 },
+          { name: "Green Apple Injector", price: 129 },
+        ],
+        "COLD COFFEE": [
+          { name: "Classic Cold Coffee", price: 99 },
+          { name: "Hazelnut Cold Coffee", price: 109 },
+        ],
+        MILKSHAKES: [
+          { name: "Strawberry Milkshake", price: 99 },
+          { name: "Butterscotch Milkshake", price: 99 },
+          { name: "Black Forest Shake", price: 99 },
+          { name: "Choco Oreo Milkshake", price: 109 },
+        ],
+        COOLERS: [
+          { name: "Fresh Lime Soda", price: 45 },
+          { name: "Lemon Ice Tea", price: 69 },
+          { name: "Green Apple Mojito", price: 89 },
+          { name: "Kaccha Aam", price: 89 },
+          { name: "Chilli Guava", price: 89 },
+          { name: "Blueberry Lemonade", price: 99 },
+          { name: "Virgin Mojito", price: 99 },
+          { name: "Masala Lemonade", price: 99 },
+        ],
+        "HOT BEVERAGES": [
+          { name: "Masala Tea", price: 20 },
+          { name: "Small Hot Coffee", price: 30 },
+          { name: "Hot Chocolate", price: 69 },
+        ],
+        DESSERTS: [
+          { name: "Ice Cream Scoop", price: 39 },
+          { name: "Choco Oreo Waffle", price: 129 },
+          { name: "Nutella Waffle", price: 149 },
+        ],
+      };
+
+      let cart = {};
+
+      function init() {
+        const container = document.getElementById("menu-container");
+        const nav = document.getElementById("nav-pills");
+        container.innerHTML = "";
+        nav.innerHTML = "";
+
+        Object.keys(menu).forEach((cat, index) => {
+          // Render Nav Pills
+          const btn = document.createElement("button");
+          btn.innerText = cat;
+          btn.className = `nav-pill px-4 py-2 rounded-full text-xs transition-all ${index === 0 ? "bg-yellow-400 text-black font-black shadow-sm" : "bg-white text-gray-600 font-bold border"}`;
+          btn.onclick = (e) => scrollToCat(cat, e.target);
+          nav.appendChild(btn);
+
+          // Render Sections
+          const section = document.createElement("section");
+          section.id = cat.replace(/\s+/g, "-");
+          section.innerHTML = `
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="h-[2px] bg-yellow-400 flex-grow"></div>
+                        <h2 class="text-sm font-black text-gray-400 uppercase tracking-[4px]">${cat}</h2>
+                        <div class="h-[2px] bg-yellow-400 flex-grow"></div>
+                    </div>
+                    <div class="menu-grid">
+                        ${menu[cat].map((item) => renderItem(item)).join("")}
+                    </div>
+                `;
+          container.appendChild(section);
+        });
+      }
+
+      function renderItem(item) {
+        const itemId = item.name.replace(/\s+/g, "-");
+        return `
+                <div class="bg-white p-4 rounded-[24px] shadow-sm border border-gray-100 flex flex-col justify-between h-full group hover:shadow-md transition-shadow">
+                    <div>
+                        <h3 class="text-xs font-black leading-tight text-gray-800 mb-1">${item.name}</h3>
+                        <p class="text-xs font-bold text-yellow-600">₹${item.price}</p>
+                    </div>
+                    <div class="mt-4 flex items-center justify-between bg-gray-50 rounded-xl p-1">
+                        <button onclick="updateCart('${item.name}', -1, ${item.price})" class="w-8 h-8 rounded-lg bg-white shadow-sm text-gray-400 font-bold">-</button>
+                        <span id="q-${itemId}" class="text-[10px] font-black">0</span>
+                        <button onclick="updateCart('${item.name}', 1, ${item.price})" class="w-8 h-8 rounded-lg bg-yellow-400 text-black shadow-sm font-bold">+</button>
+                    </div>
+                </div>
+            `;
+      }
+
+      function updateCart(name, delta, price) {
+        if (!cart[name]) cart[name] = { qty: 0, price: price };
+        cart[name].qty = Math.max(0, cart[name].qty + delta);
+
+        const itemId = name.replace(/\s+/g, "-");
+        const qtyLabel = document.getElementById(`q-${itemId}`);
+        if (qtyLabel) qtyLabel.innerText = cart[name].qty;
+
+        refreshCartBar();
+      }
+
+      function refreshCartBar() {
+        let total = 0,
+          count = 0;
+        for (const item in cart) {
+          total += cart[item].qty * cart[item].price;
+          count += cart[item].qty;
+        }
+        const bar = document.getElementById("cart-bar");
+        document.getElementById("cart-total").innerText = total;
+        document.getElementById("cart-count").innerText = count;
+        bar.style.transform = count > 0 ? "translateY(0)" : "translateY(150%)";
+      }
+
+      function openCheckout() {
+        document.getElementById("modal").classList.remove("hidden");
+        document.getElementById("modal").classList.add("flex");
+        const summary = document.getElementById("order-summary");
+        summary.innerHTML = Object.entries(cart)
+          .filter(([_, d]) => d.qty > 0)
+          .map(
+            ([n, d]) => `
+                <div class="flex justify-between text-xs py-1 border-b border-gray-100">
+                    <span><span class="font-black text-yellow-600">${d.qty}x</span> ${n}</span>
+                    <span class="font-bold">₹${d.qty * d.price}</span>
+                </div>
+            `,
+          )
+          .join("");
+      }
+
+      function closeCheckout() {
+        document.getElementById("modal").classList.add("hidden");
+        document.getElementById("modal").classList.remove("flex");
+      }
+
+      async function sendOrder() {
+        const name = document.getElementById("cust-name").value;
+        const phone = document.getElementById("cust-phone").value;
+        const btn = document.getElementById("final-submit");
+        if (!name || !phone)
+          return alert("Please fill your name and phone number!");
+
+        const itemsStr = Object.entries(cart)
+          .filter(([_, d]) => d.qty > 0)
+          .map(([n, d]) => `${d.qty}x ${n}`)
+          .join("\n");
+        const total = document.getElementById("cart-total").innerText;
+
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> SENDING...`;
+
+        try {
+          const response = await fetch("/api/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              customerName: name,
+              phone: phone,
+              items: itemsStr,
+              totalAmount: total,
+            }),
+          });
+          if (response.ok) {
+            alert("Order sent! Wait for acceptance on Telegram.");
+            window.location.reload();
+          } else throw new Error();
+        } catch (err) {
+          alert("Error connecting to server.");
+          btn.disabled = false;
+          btn.innerHTML = `SEND TO RESTAURANT <i class="fa-solid fa-paper-plane text-yellow-400"></i>`;
+        }
+      }
+
+      function scrollToCat(id, btn) {
+        const pills = document.querySelectorAll(".nav-pill");
+        pills.forEach((p) => {
+          p.classList.remove(
+            "bg-yellow-400",
+            "text-black",
+            "font-black",
+            "shadow-sm",
+          );
+          p.classList.add("bg-white", "text-gray-600", "font-bold", "border");
+        });
+
+        btn.classList.add(
+          "bg-yellow-400",
+          "text-black",
+          "font-black",
+          "shadow-sm",
+        );
+        btn.classList.remove(
+          "bg-white",
+          "text-gray-600",
+          "font-bold",
+          "border",
+        );
+
+        window.scrollTo({
+          top: document.getElementById(id.replace(/\s+/g, "-")).offsetTop - 120,
+          behavior: "smooth",
+        });
+      }
+
+      function filterMenu() {
+        const query = document.getElementById("search").value.toLowerCase();
+        document.querySelectorAll(".menu-grid > div").forEach((c) => {
+          c.style.display = c
+            .querySelector("h3")
+            .innerText.toLowerCase()
+            .includes(query)
+            ? "flex"
+            : "none";
+        });
+      }
+
+      init();
+    </script>
+  </body>
+</html>
